@@ -5578,15 +5578,20 @@ function changeStxCounter(n){stxCounter+=n;document.getElementById('stxCounterVa
 <script>try{var _l=document.querySelector(".stx-splash-logo");if(_l){document.querySelectorAll("#authLogo,img[data-logo]").forEach(function(a){a.src=_l.src;});}}catch(e){}
 /* ===== Instal aplikasi (PWA) ===== */
 let stxDeferredInstall = null;
+function stxIsStandalone() {
+  return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+}
 function stxToggleInstallUi(show) {
   const a = document.getElementById("installAppRow"), b = document.getElementById("installLoginBtn");
+  if(show && stxIsStandalone()) show = false;
   if(a) a.style.display = show ? "flex" : "none";
   if(b) b.style.display = show ? "block" : "none";
 }
+window.addEventListener("load", function() { stxToggleInstallUi(true); });
 window.addEventListener("beforeinstallprompt", function(e) { e.preventDefault(); stxDeferredInstall = e; stxToggleInstallUi(true); });
 window.addEventListener("appinstalled", function() { stxDeferredInstall = null; stxToggleInstallUi(false); showToast("STX berhasil diinstal! 🎉"); });
 async function stxInstallApp() {
-  if(!stxDeferredInstall) { showToast('Buka menu ⋮ di Chrome lalu pilih "Instal aplikasi".'); return; }
+  if(!stxDeferredInstall) { showToast('Buka halaman ini di Chrome, lalu menu ⋮ → "Instal aplikasi". Jika sudah terinstal, buka dari beranda.'); return; }
   stxDeferredInstall.prompt();
   try { await stxDeferredInstall.userChoice; } catch(e) {}
   stxDeferredInstall = null; stxToggleInstallUi(false);
